@@ -2,6 +2,7 @@
 
 var path = process.cwd();
 var ClickHandler = require(path + '/app/controllers/clickHandler.server.js');
+var url = require('url');
 
 module.exports = function (app, passport) {
 
@@ -9,7 +10,7 @@ module.exports = function (app, passport) {
 		if (req.isAuthenticated()) {
 			return next();
 		} else {
-			res.redirect('/login');
+			res.redirect('/time');
 		}
 	}
 
@@ -18,6 +19,36 @@ module.exports = function (app, passport) {
 	app.route('/')
 		.get(isLoggedIn, function (req, res) {
 			res.sendFile(path + '/public/index.html');
+		});
+		
+	app.route('/time')
+		.get(function (req, res) {
+			res.sendFile(path + '/public/time.html');
+		});
+		
+	app.route('/time/:times')
+		.get(function(req, res) {
+			var timepart = req.url.split('/')[2].split('%20').join(' ');
+			if(!isNaN(new Date(timepart).getTime())){
+				var date = new Date(timepart);
+			} else {
+				var date = new Date(Number(timepart));
+			}
+			
+			console.log(timepart);
+			console.log(date);
+//         var date = new Date(parser.query.substr(4)); console.log(date);
+//         // if(parser.pathname === '/api/parsetime'){
+// //              date = new Date(parser.query.iso);
+                //res.writeHead(200, { 'Content-Type': 'application/json' });
+                var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                var isotime = {
+                "unix": date.getTime(),
+                "natural": date.toLocaleDateString('en-US', options)
+                 }
+                res.send(JSON.stringify(isotime));
+        // }
+		   //res.send(date); 
 		});
 
 	app.route('/login')
