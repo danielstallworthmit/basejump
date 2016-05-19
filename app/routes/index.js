@@ -10,7 +10,7 @@ module.exports = function (app, passport) {
 		if (req.isAuthenticated()) {
 			return next();
 		} else {
-			res.redirect('/time');
+			res.redirect('/parser');
 		}
 	}
 
@@ -19,6 +19,19 @@ module.exports = function (app, passport) {
 	app.route('/')
 		.get(isLoggedIn, function (req, res) {
 			res.sendFile(path + '/public/index.html');
+		});
+	
+	app.route('/parser')
+		.get(function (req, res) {
+			var head = req.headers;
+			//console.log(req.connection.remoteAddress);
+			var browserinfo = {
+                "ip": head['x-forwarded-for'],
+                "language": head['accept-language'].split(',')[0],
+                "Operating System": head['user-agent']
+                 }
+                 
+                res.send(JSON.stringify(browserinfo));
 		});
 		
 	app.route('/time')
